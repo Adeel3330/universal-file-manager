@@ -1,0 +1,31 @@
+{
+    "name": "adeel3330/universal-file-manager",
+    "description": "Universal File Manager For Laravel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adeel3330"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "livewire/livewire": "^3.0",
+        "intervention/image": "^2.7",
+        "spatie/laravel-image-optimizer": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "UniversalFileManager\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "UniversalFileManager\\UniversalFileManagerServiceProvider"
+            ]
+        }
+    }
+}
