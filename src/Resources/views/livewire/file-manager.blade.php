@@ -1,5 +1,17 @@
-<div class="p-6 bg-gray-50 min-h-screen">
+<div class="p-6 bg-gray-50 min-h-screen" wire:poll.600s>
     <div class="max-w-7xl mx-auto">
+        <!-- Status Messages -->
+        @if (session()->has('message'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg shadow-sm">
+            {{ session('message') }}
+        </div>
+        @endif
+        @if (session()->has('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-sm">
+            {{ session('error') }}
+        </div>
+        @endif
+
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>

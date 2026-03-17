@@ -55,8 +55,13 @@ class FileManager extends Component
             'files.*' => 'required|file|max:20480', // 20MB max
         ]);
 
-        foreach ($this->files as $file) {
-            $this->uploadFile($file);
+        try {
+            foreach ($this->files as $file) {
+                $this->uploadFile($file);
+            }
+            session()->flash('message', count($this->files) . ' files uploaded successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Upload failed: ' . $e->getMessage());
         }
 
         $this->files = [];
