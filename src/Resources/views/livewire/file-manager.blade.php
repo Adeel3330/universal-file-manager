@@ -1,4 +1,20 @@
-<div class="p-6 bg-gray-50 min-h-screen" wire:poll.600s>
+<div class="p-6 bg-gray-50 min-h-screen" wire:poll.600s
+    x-data="{ 
+        contextMenu: { show: false, x: 0, y: 0, targetId: null, isFolder: false },
+        closeMenu() { this.contextMenu.show = false },
+        openMenu(e, id, isFolder) {
+            e.preventDefault();
+            this.contextMenu.show = true;
+            this.contextMenu.x = e.clientX;
+            this.contextMenu.y = e.clientY;
+            this.contextMenu.targetId = id;
+            this.contextMenu.isFolder = isFolder;
+            $wire.selectMedia(id);
+        }
+    }"
+    @click="closeMenu()"
+    @contextmenu="closeMenu()">
+
     <div class="max-w-7xl mx-auto">
         <!-- Status Messages -->
         @if (session()->has('message'))
@@ -36,8 +52,59 @@
                     Upload
                 </button>
                 <input type="file" id="file-upload" wire:model="files" multiple class="hidden">
+
+                <!-- Header Action Menu (Three Dots) -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click.stop="open = !open" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                        </svg>
+                    </button>
+                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
+                        <button wire:click="copyMedia({{ $selectedId }})" @click="open = false" @if(!$selectedId) disabled @endif class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                            </svg>
+                            Copy
+                        </button>
+                        <button wire:click="moveMedia({{ $selectedId }})" @click="open = false" @if(!$selectedId) disabled @endif class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            Move
+                        </button>
+                        <button wire:click="paste" @click="open = false" @if(!$clipboardAction) disabled @endif class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Paste Here
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Clipboard Bar -->
+        @if($clipboardAction)
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3 text-blue-800">
+                <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                <span class="font-medium">
+                    {{ ucfirst($clipboardAction) }}ing selected item. Navigate to destination and click Paste.
+                </span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button wire:click="paste" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
+                    Paste Here
+                </button>
+                <button wire:click="cancelClipboard" class="text-gray-500 hover:text-gray-700 text-sm font-medium">
+                    Cancel
+                </button>
+            </div>
+        </div>
+        @endif
 
         <!-- Breadcrumbs & Actions -->
         <div class="flex items-center justify-between mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -76,7 +143,7 @@
             x-data="{ dragging: false }"
             @dragover.prevent="dragging = true"
             @dragleave.prevent="dragging = false"
-            @drop.prevent="dragging = false; $wire.upload('files', $event.dataTransfer.files)">
+            @drop.prevent.stop="dragging = false; if($event.dataTransfer.files.length > 0) $wire.upload('files', $event.dataTransfer.files)">
 
             <div x-show="dragging" class="fixed inset-0 z-50 flex items-center justify-center bg-blue-600 bg-opacity-10 pointer-events-none">
                 <div class="bg-white p-8 rounded-2xl shadow-xl border-2 border-dashed border-blue-500">
@@ -86,18 +153,12 @@
 
             @forelse($mediaItems as $item)
             <div wire:key="media-{{ $item->id }}"
-                class="group relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 transition-all hover:shadow-md hover:border-blue-200 cursor-pointer overflow-hidden">
+                @click.stop="$wire.selectMedia({{ $item->id }})"
+                @dblclick.stop="{{ $item->is_folder ? '$wire.navigateTo('.$item->id.')' : '' }}"
+                @contextmenu.prevent="openMenu($event, {{ $item->id }}, {{ $item->is_folder ? 'true' : 'false' }})"
+                class="group relative rounded-xl p-4 transition-all cursor-pointer overflow-hidden border-2 {{ $selectedId == $item->id ? 'bg-blue-50 border-blue-400 shadow-md' : 'bg-white border-transparent hover:border-gray-100 hover:shadow-sm' }}">
 
-                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                    <button wire:click="deleteMedia({{ $item->id }})" wire:confirm="Are you sure you want to delete this?"
-                        class="p-1.5 bg-white text-red-500 hover:bg-red-50 rounded-lg shadow-sm border border-gray-100 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div wire:click="{{ $item->is_folder ? 'navigateTo('.$item->id.')' : '' }}" class="flex flex-col items-center">
+                <div class="flex flex-col items-center">
                     <div class="w-full aspect-square flex items-center justify-center mb-3 bg-gray-50 rounded-lg transition-transform group-hover:scale-105">
                         @if($item->is_folder)
                         <svg class="w-16 h-16 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -121,6 +182,16 @@
                     </span>
                     @endif
                 </div>
+
+                @if($selectedId == $item->id)
+                <div class="absolute top-2 right-2">
+                    <div class="bg-blue-600 rounded-full p-1 text-white shadow-sm">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                        </svg>
+                    </div>
+                </div>
+                @endif
             </div>
             @empty
             <div class="col-span-full py-20 flex flex-col items-center justify-center text-gray-400">
@@ -131,6 +202,59 @@
             </div>
             @endforelse
         </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div x-show="contextMenu.show"
+        @click.away="closeMenu()"
+        x-cloak
+        :style="`position: fixed; left: ${contextMenu.x}px; top: ${contextMenu.y}px;`"
+        class="bg-white border border-gray-100 rounded-xl shadow-2xl z-[100] py-2 w-56 overflow-hidden">
+
+        <div class="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</div>
+
+        <button wire:click="copyMedia(contextMenu.targetId)" @click="closeMenu()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-3 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+            </svg>
+            Copy
+        </button>
+        <button wire:click="moveMedia(contextMenu.targetId)" @click="closeMenu()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 flex items-center gap-3 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            Move
+        </button>
+        <button wire:click="paste" @click="closeMenu()" @if(!$clipboardAction) disabled @endif class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Paste Here
+        </button>
+
+        <div class="h-px bg-gray-100 my-1"></div>
+
+        <button wire:click="downloadMedia(contextMenu.targetId)" @click="closeMenu()" x-show="!contextMenu.isFolder" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download
+        </button>
+        <button wire:click="selectMedia(contextMenu.targetId)" @click="closeMenu()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Select/Deselect
+        </button>
+
+        <div class="h-px bg-gray-100 my-1"></div>
+
+        <button wire:click="deleteMedia(contextMenu.targetId)" wire:confirm="Are you sure you want to delete this?" @click="closeMenu()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+        </button>
     </div>
 
     <!-- Upload Progress -->

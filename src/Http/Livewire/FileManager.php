@@ -4,6 +4,7 @@ namespace UniversalFileManager\Http\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\Storage;
 use UniversalFileManager\Models\Media;
 use Intervention\Image\Facades\Image;
@@ -14,15 +15,24 @@ class FileManager extends Component
     use WithFileUploads;
 
     public $files = [];
+    #[Url]
     public $currentFolderId = null;
     public $newFolderName;
+    #[Url]
     public $search = '';
+
+    #[Url]
+    public $clipboardId = null;
+    #[Url]
+    public $clipboardAction = null; // 'copy' or 'move'
+
+    public $selectedId = null;
 
     protected $listeners = ['refreshFileManager' => '$refresh'];
 
-    public function mount($folderId = null)
+    public function mount()
     {
-        $this->currentFolderId = $folderId;
+        // currentFolderId and search are automatically hydrated from URL
     }
 
     public function getMediaProperty()
@@ -132,7 +142,7 @@ class FileManager extends Component
     public function navigateTo($folderId)
     {
         $this->currentFolderId = $folderId;
-        $this->dispatch('refreshFileManager');
+        $this->selectedId = null;
     }
 
     public function deleteMedia($id)
@@ -141,10 +151,106 @@ class FileManager extends Component
 
         if (!$media->is_folder) {
             Storage::disk($media->disk)->delete($media->path);
+        } else {
+            // Recursively delete folder contents
+            foreach ($media->children as $child) {
+                $this->deleteMedia($child->id);
+            }
         }
 
         $media->delete();
         $this->dispatch('refreshFileManager');
+    }
+
+    public function copyMedia($id)
+    {
+        $this->clipboardId = $id;
+        $this->clipboardAction = 'copy';
+    }
+
+    public function moveMedia($id)
+    {
+        $this->clipboardId = $id;
+        $this->clipboardAction = 'move';
+    }
+
+    public function cancelClipboard()
+    {
+        $this->clipboardId = null;
+        $this->clipboardAction = null;
+    }
+
+    public function paste()
+    {
+        if (!$this->clipboardId || !$this->clipboardAction) return;
+
+        $item = Media::findOrFail($this->clipboardId);
+
+        if ($this->clipboardAction === 'move') {
+            $item->update(['parent_id' => $this->currentFolderId]);
+        } else {
+            $this->duplicateMedia($item, $this->currentFolderId);
+        }
+
+        $this->cancelClipboard();
+        $this->dispatch('refreshFileManager');
+    }
+
+    protected function duplicateMedia(Media $item, $parentId)
+    {
+        $newItem = $item->replicate();
+        $newItem->parent_id = $parentId;
+
+        if (!$item->is_folder) {
+            // Copy physical file
+            $newPath = 'uploads/' . Str::random(40) . '.' . pathinfo($item->path, PATHINFO_EXTENSION);
+            Storage::disk($item->disk)->copy($item->path, $newPath);
+            $newItem->path = $newPath;
+            $newItem->file_name = basename($newPath);
+        }
+
+        $newItem->save();
+
+        if ($item->is_folder) {
+            foreach ($item->children as $child) {
+                $this->duplicateMedia($child, $newItem->id);
+            }
+        }
+    }
+
+    public function moveToFolder($itemId, $targetFolderId)
+    {
+        // Prevent moving a folder into itself or its children
+        if ($itemId == $targetFolderId) return;
+
+        $item = Media::findOrFail($itemId);
+
+        if ($item->is_folder) {
+            $current = Media::find($targetFolderId);
+            while ($current) {
+                if ($current->id == $itemId) return; // Cannot move into child
+                $current = $current->parent;
+            }
+        }
+
+        $item->update(['parent_id' => $targetFolderId]);
+        $this->dispatch('refreshFileManager');
+    }
+
+    public function selectMedia($id)
+    {
+        $this->selectedId = ($this->selectedId == $id) ? null : $id;
+    }
+
+    public function downloadMedia($id)
+    {
+        $media = Media::findOrFail($id);
+
+        if ($media->is_folder) {
+            return session()->flash('error', 'Cannot download folders yet.');
+        }
+
+        return Storage::disk($media->disk)->download($media->path, $media->name);
     }
 
     public function render()
