@@ -38,11 +38,13 @@ class FileManager extends Component
 
     public function getMediaProperty()
     {
-        return Media::where('parent_id', $this->currentFolderId)
-            ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy('is_folder', 'desc')
+        $query = Media::where('parent_id', $this->currentFolderId);
+
+        if ($this->search) {
+            $query->where('name', 'like', '%' . $this->search . '%');
+        }
+
+        return $query->orderBy('is_folder', 'desc')
             ->orderBy('name', 'asc')
             ->get();
     }
@@ -140,7 +142,7 @@ class FileManager extends Component
         $this->dispatch('refreshFileManager');
     }
 
-    public function navigateTo($folderId)
+    public function navigateTo($folderId = null)
     {
         $this->currentFolderId = $folderId;
         $this->selectedIds = [];
@@ -149,24 +151,30 @@ class FileManager extends Component
     public function deleteMedia($id = null)
     {
         $ids = $id ? [$id] : $this->selectedIds;
+        if (empty($ids)) return;
 
         foreach ($ids as $targetId) {
-            $media = Media::findOrFail($targetId);
+            $media = Media::find($targetId);
+            if (!$media) continue;
 
-            if (!$media->is_folder) {
-                Storage::disk($media->disk)->delete($media->path);
-            } else {
-                // Recursively delete folder contents
-                foreach ($media->children as $child) {
-                    $this->deleteMedia($child->id);
-                }
-            }
-
-            $media->delete();
+            $this->performDelete($media);
         }
 
         $this->selectedIds = array_diff($this->selectedIds, $ids);
         $this->dispatch('refreshFileManager');
+    }
+
+    protected function performDelete(Media $media)
+    {
+        if ($media->is_folder) {
+            foreach ($media->children as $child) {
+                $this->performDelete($child);
+            }
+        } else {
+            Storage::disk($media->disk)->delete($media->path);
+        }
+
+        $media->delete();
     }
 
     public function copyMedia($id = null)
@@ -249,11 +257,44 @@ class FileManager extends Component
 
     public function selectMedia($id)
     {
+        $id = (string)$id;
         if (in_array($id, $this->selectedIds)) {
             $this->selectedIds = array_diff($this->selectedIds, [$id]);
         } else {
             $this->selectedIds[] = $id;
         }
+    }
+
+    public function selectAll()
+    {
+        $ids = Media::where('parent_id', $this->currentFolderId)->pluck('id')->toArray();
+        $this->selectedIds = array_map('strval', $ids);
+    }
+
+    public function getUrl($path)
+    {
+        if (!$path) return null;
+        $url = Storage::disk(config('ufm.storage_disk', 'public'))->url($path);
+
+        // Fix port mismatch for local development
+        $parsed = parse_url($url);
+        if (isset($parsed['host']) && ($parsed['host'] === 'localhost' || $parsed['host'] === '127.0.0.1')) {
+            $currentPort = request()->getPort();
+            // Replace port 8000 with current port if mismatch
+            if (isset($parsed['port']) && $parsed['port'] != $currentPort) {
+                $url = str_replace(':' . $parsed['port'], ':' . $currentPort, $url);
+            } elseif (!isset($parsed['port']) && $currentPort != 80) {
+                // If no port in URL but current port is not 80, inject it
+                $url = str_replace($parsed['host'], $parsed['host'] . ':' . $currentPort, $url);
+            }
+        }
+
+        return $url;
+    }
+
+    public function unselectAll()
+    {
+        $this->selectedIds = [];
     }
 
     public function downloadMedia($id = null)
