@@ -150,8 +150,12 @@ class FileManager extends Component
 
     public function deleteMedia($id = null)
     {
+        \Illuminate\Support\Facades\Log::info('deleteMedia called', ['id' => $id, 'selectedIds' => $this->selectedIds]);
         $ids = $id ? [$id] : $this->selectedIds;
-        if (empty($ids)) return;
+        if (empty($ids)) {
+            \Illuminate\Support\Facades\Log::info('No IDs to delete');
+            return;
+        }
 
         foreach ($ids as $targetId) {
             $media = Media::find($targetId);
@@ -263,6 +267,7 @@ class FileManager extends Component
         } else {
             $this->selectedIds[] = $id;
         }
+        \Illuminate\Support\Facades\Log::info('selectMedia called', ['id' => $id, 'selectedIds' => $this->selectedIds]);
     }
 
     public function selectAll()

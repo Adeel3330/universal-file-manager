@@ -12,7 +12,7 @@
             </svg>
         </x-ufm::input>
 
-        <x-ufm::button onclick="document.getElementById('file-upload').click()">
+        <x-ufm::button class="text-white" onclick="document.getElementById('file-upload').click()">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
