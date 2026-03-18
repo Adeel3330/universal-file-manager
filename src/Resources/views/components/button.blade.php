@@ -2,7 +2,7 @@
 
 @php
 $variants = [
-'primary' => 'px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg active:scale-95 font-bold',
+'primary' => 'px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 shadow-lg active:scale-95 font-bold',
 'secondary' => 'px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-sm active:scale-95 font-bold',
 'danger' => 'px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-lg active:scale-95 font-bold',
 'success' => 'px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-lg active:scale-95 font-bold',

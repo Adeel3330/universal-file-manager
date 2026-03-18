@@ -103,13 +103,13 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <x-ufm::button wire:click="paste" class="bg-white text-blue-600 px-8 py-3 rounded-xl font-black transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
+                <x-ufm::button wire:click="paste" class="bg-white text-blue-600 px-8 hover:text-white py-3 rounded-xl font-black transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
                     <svg class="w-5 h-5 font-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
                     Confirm Paste
                 </x-ufm::button>
-                <button wire:click="cancelClipboard" class="text-white/80 hover:text-white px-4 py-2 rounded-xl font-bold transition-colors">
+                <button wire:click="cancelClipboard" class="text-blue-600/80 hover:text-blue-600 px-4 py-2 rounded-xl font-bold transition-colors">
                     Cancel
                 </button>
             </div>
