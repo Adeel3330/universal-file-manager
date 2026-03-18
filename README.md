@@ -1,69 +1,68 @@
-# Universal File Manager for Laravel
+# 🚀 Universal File Manager for Laravel
 
-A powerful, premium gallery-style file manager for Laravel applications using Livewire and Tailwind CSS.
+A state-of-the-art, premium, and feature-rich file manager designed specifically for Laravel applications. Powered by **Livewire 3**, **Alpine.js**, and **Tailwind CSS**, it offers a seamless, desktop-class experience for managing assets.
 
-## Features
+![File Manager Preview](https://via.placeholder.com/1200x600.png?text=Universal+File+Manager+Preview)
 
-- 📁 Folder management (Nested folders)
-- 📤 Multiple file uploads with Drag & Drop
-- 🖼️ Automatic image resizing & compression
-- 🔍 Real-time search
-- 🍱 Premium Gallery UI
-- 📱 Responsive design
+## ✨ Modern Features
 
-## Installation
+### 📦 Multi-Selection & Bulk Actions
+- **Intuitive Selection**: Click to select individual items or use the "Select All" feature.
+- **Bulk Operations**: Copy, Move, Delete, or Download multiple files and folders in a single click.
+- **Dynamic Action Menu**: A contextually aware header menu that updates based on your current selection.
 
-### 1. In your Laravel Project
+### 🍱 Desktop-Class UI/UX
+- **Double-Click Navigation**: Familiar interactions—double-click to enter folders or preview images.
+- **Breadcrumb Navigation**: Effortlessly navigate through deep folder hierarchies.
+- **Search & Filter**: Real-time searching to find files instantly as you type.
+- **Custom Context Menu**: Right-click on any item for quick access to actions like Rename, Copy, Move, and Delete.
 
-Since this is a local package, you need to tell your main Laravel project where to find it. Open the `composer.json` of your **main Laravel application** and add:
+### 📤 Advanced Upload System
+- **Real-Time Progress**: Interactive progress bar with per-second speed tracking.
+- **ETA Calculation**: Know exactly when your uploads will finish with estimated remaining time.
+- **Drag & Drop**: Simply drop files into the workspace to start an upload.
+- **Processing**: Automatic image resizing and compression using Intervention Image.
 
-```json
-"repositories": [
-    {
-        "type": "path",
-        "url": "../universal-file-manager"
-    }
-],
-```
-*(Adjust the path to where your package is located)*
+### 🖼️ Image Previews & Handling
+- **Built-in Modal**: Preview images without leaving the page using a sleek, glassmorphism-inspired modal.
+- **Port Correction**: Intelligent URL handling that automatically detects and corrects port mismatches (e.g., port 8000 vs 8003), ensuring assets always load in local development environments.
 
-Then run:
+## 🛠️ Installation
+
+### 1. Require the Package
 ```bash
-composer require adeel3330/universal-file-manager:@dev
+composer require adeel3330/universal-file-manager
 ```
 
-### 2. Publish Configuration and Assets
-
+### 2. Publish & Migrate
 ```bash
 php artisan vendor:publish --tag=ufm-config
 php artisan vendor:publish --tag=ufm-views
-```
-
-### 3. Run Migrations
-
-```bash
 php artisan migrate
 ```
 
-## Usage
+## 🚀 Usage
 
-Once installed, you can access the file manager at:
-`your-app.test/file-manager`
+### Standalone Page
+The file manager is accessible by default at:
+`http://your-app.test/file-manager`
 
-### Using the Livewire Component
-You can also embed the file manager in any Blade view:
+### Embedding in Views
+You can embed the file manager into any Blade layout or panel:
 
 ```blade
 <livewire:ufm-file-manager />
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-You can customize the allowed file types, max file size, and image processing settings in `config/ufm.php`.
+Control every aspect of the manager in `config/ufm.php`. Configure storage disks, allowed extensions, and image quality settings.
 
 ```php
 return [
     'storage_disk' => 'public',
+    'route_prefix' => 'file-manager',
+    'middleware' => ['web'],
     'allowed_file_types' => ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'zip'],
     'max_file_size' => 20480, // 20MB
     'image_processing' => [
@@ -73,3 +72,13 @@ return [
     ],
 ];
 ```
+
+## 🎨 Technology Stack
+- **Framework**: Laravel 12+
+- **Interactivity**: Livewire 4 & Alpine.js
+- **Styling**: Tailwind CSS
+- **Image Handling**: Intervention Image
+- **Storage**: Laravel Storage abstraction
+
+---
+Developed with ❤️ by the Xiaroo Team.
