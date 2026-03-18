@@ -90,7 +90,7 @@
 
         <!-- Clipboard Bar (Keep inline as it's a global notification bar) -->
         @if(!empty($clipboardIds))
-        <div class="mb-6 p-5 bg-blue-600 border border-blue-700 rounded-2xl flex items-center justify-between shadow-xl animate-in slide-in-from-top duration-300">
+        <div class="mb-6 p-5 bg-blue-300 border border-blue-300 rounded-2xl flex items-center justify-between shadow-xl animate-in slide-in-from-top duration-300">
             <div class="flex items-center gap-4 text-white">
                 <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
                     <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <x-ufm::button wire:click="paste" class="bg-white text-blue-600 px-8 py-3 rounded-xl font-black transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
+                <x-ufm::button wire:click="paste" class="bg-white text-blue-300 px-8 py-3 rounded-xl font-black transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
                     <svg class="w-5 h-5 font-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
