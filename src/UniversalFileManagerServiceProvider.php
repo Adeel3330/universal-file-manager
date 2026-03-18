@@ -31,6 +31,9 @@ class UniversalFileManagerServiceProvider extends ServiceProvider
 
         // Register Livewire Component
         Livewire::component('ufm-file-manager', FileManager::class);
+
+        // Register Blade Components
+        \Illuminate\Support\Facades\Blade::anonymousComponentPath(__DIR__ . '/Resources/views/components', 'ufm');
     }
 
     public function register()
