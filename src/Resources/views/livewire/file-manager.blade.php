@@ -90,7 +90,6 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Universal File Manager</h1>
-                <p class="text-gray-500 mt-1 font-medium">Advanced Multi-Selection & Bulk Actions Enabled.</p>
             </div>
 
             <div class="flex items-center gap-3">
