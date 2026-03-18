@@ -90,20 +90,20 @@
 
         <!-- Clipboard Bar (Keep inline as it's a global notification bar) -->
         @if(!empty($clipboardIds))
-        <div class="mb-6 p-5 bg-blue-300 border border-blue-300 rounded-2xl flex items-center justify-between shadow-xl animate-in slide-in-from-top duration-300">
+        <div class="mb-6 p-5 bg-blue-100 border border-blue-300 rounded-2xl flex items-center justify-between shadow-xl animate-in slide-in-from-top duration-300 text-blue-900">
             <div class="flex items-center gap-4 text-white">
                 <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 animate-pulse text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                     </svg>
                 </div>
                 <div>
-                    <span class="font-black text-xl leading-none block">{{ ucfirst($clipboardAction) }} In Progress</span>
-                    <span class="text-blue-100 text-sm font-medium">{{ count($clipboardIds) }} items ready in buffer. Navigate to target folder.</span>
+                    <span class="text-blue-500 text-md font-bold leading-none block">{{ ucfirst($clipboardAction) }} In Progress</span>
+                    <span class="text-blue-500 text-sm font-medium">{{ count($clipboardIds) }} items ready in buffer. Navigate to target folder.</span>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <x-ufm::button wire:click="paste" class="bg-white text-blue-300 px-8 py-3 rounded-xl font-black transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
+                <x-ufm::button wire:click="paste" class="bg-white text-blue-600 px-8 py-3 rounded-xl font-black transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
                     <svg class="w-5 h-5 font-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
