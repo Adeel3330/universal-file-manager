@@ -1,6 +1,9 @@
 <?php
 
 return [
+    // Frontend stack: 'blade', 'livewire', 'vue', 'react'
+    'stack' => 'livewire',
+
     'storage_disk' => 'public',
 
     'allowed_file_types' => ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'zip'],
